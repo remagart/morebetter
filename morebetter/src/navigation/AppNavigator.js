@@ -10,6 +10,7 @@ export default AppNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator>
                 <Stack.Screen name={NavigationScreenName.Home} component={NavigationScreenManager.HomeScreen}/>
+                <Stack.Screen name={NavigationScreenName.RecordScreen} component={NavigationScreenManager.RecordScreen}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
