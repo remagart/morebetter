@@ -12,6 +12,12 @@ const HomeScreen = (props) => {
     return (
         <View style={styles.container}>
             <View style={{height: 200}}/>
+            <TouchableOpacity onPress={()=>{props.navigation.navigate(NavigationScreenName.TestScreen)}}>
+                <View style={styles.btn}>
+                    <Text>Test</Text>
+                </View>
+            </TouchableOpacity>
+            <View style={{height: 40}}/>
             <TouchableOpacity onPress={()=>{props.navigation.navigate(NavigationScreenName.RecordScreen)}}>
                 <View style={styles.btn}>
                     <Text>Forgetting curve</Text>
