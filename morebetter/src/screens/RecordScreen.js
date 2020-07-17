@@ -1,8 +1,10 @@
 import React, { useEffect,useState } from 'react'
-import { Text, View,StyleSheet,FlatList } from 'react-native';
+import { Text, View,StyleSheet,FlatList,TouchableOpacity } from 'react-native';
 import {Fib} from "../utils/forgetting_curve/Fibonacci";
 import DateHelper from '../utils/common/DateHelper';
 import CommonStyle from "../style/CommonStyle";
+import apiEnglishRed from "../API/EnglishRed/apiEnglishRed";
+import NavigationScreenName from '../navigation/NavigationScreenName';
 
 const DAY11 = "2020-07-06";
 const InitDay = 11;
@@ -11,11 +13,27 @@ const DUR = DateHelper.calculateDurationMin(DAY11,NOW,"days");
 
 const RecordScreen = (props) => {
     const [dayData, setdayData] = useState([]);
+    const [dataList, setdataList] = useState([]);
 
     useEffect(()=>{
         let day = Fib(DUR);
         setdayData(day);
+
+        const fetchData = async()=>{
+            let list = await apiEnglishRed.fetchData();
+            console.log("list",list);
+
+            setdataList(list);
+        }
+        fetchData();
     },[]);
+
+    const onClickedBlock = (count) => {
+        let arr = dataList[count].vol;
+        requestAnimationFrame(()=>{
+            props.navigation.navigate(NavigationScreenName.TestScreen,{list: arr});
+        });
+    }
 
     const renderTitle = () => {
         return (
@@ -27,11 +45,15 @@ const RecordScreen = (props) => {
     
     const renderBlock = (item) => {
         let target = DateHelper.addDayFormatString(NOW,(0-item),"YYYY-MM-DD");
+        let dayFromStart = DUR-item+InitDay;
+        let firstword = dataList && dataList.length > 0 && dataList[dayFromStart - InitDay].vol[0];
         
         return (
-            <View style={styles.blockView}>
-                <Text>{target}: DAY{DUR-item+InitDay}: </Text>
-            </View>
+            <TouchableOpacity onPress={()=>{onClickedBlock(dayFromStart - InitDay)}}>
+                <View style={styles.blockView}>
+                    <Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+                </View>
+            </TouchableOpacity>
         );
     }
 
