@@ -46,15 +46,24 @@ const RecordScreen = (props) => {
     const renderBlock = (item) => {
         let target = DateHelper.addDayFormatString(NOW,(0-item),"YYYY-MM-DD");
         let dayFromStart = DUR-item+InitDay;
-        let firstword = dataList && dataList.length > 0 && dataList[dayFromStart - InitDay].vol[0];
-        
-        return (
-            <TouchableOpacity onPress={()=>{onClickedBlock(dayFromStart - InitDay)}}>
+        let firstword = (dataList && dataList.length > 0 && dataList[dayFromStart - InitDay] && dataList[dayFromStart - InitDay].vol[0]) || null;
+
+        if(firstword === null){
+            return(
                 <View style={styles.blockView}>
-                    <Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+                    <Text>{target}: DAY{dayFromStart}: </Text>
                 </View>
-            </TouchableOpacity>
-        );
+            );
+        }
+        else{
+            return (
+                <TouchableOpacity onPress={()=>{onClickedBlock(dayFromStart - InitDay)}}>
+                    <View style={styles.blockView}>
+                        <Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+                    </View>
+                </TouchableOpacity>
+            );
+        }
     }
 
     const renderList = () => {
