@@ -44,8 +44,14 @@ const RecordScreen = (props) => {
     }
     
     const renderBlock = (item) => {
-        let target = DateHelper.addDayFormatString(NOW,(0-item),"YYYY-MM-DD");
-        let dayFromStart = DUR-item+InitDay;
+        let currentHour = DateHelper.getOptionalTimeFormatString(NOW,"HH");
+        let sleepLater = 0;
+        if(Number(currentHour) <= 6 && Number(currentHour) >= 0){
+            sleepLater = 1;
+        }
+
+        let target = DateHelper.addDayFormatString(NOW,(0-item-sleepLater),"YYYY-MM-DD");
+        let dayFromStart = DUR-item+InitDay-sleepLater;
         let firstword = (dataList && dataList.length > 0 && dataList[dayFromStart - InitDay] && dataList[dayFromStart - InitDay].vol[0]) || null;
 
         if(firstword === null){

@@ -1,20 +1,25 @@
-import React, {useEffect} from 'react';
+import React, {useEffect,useRef,createRef} from 'react';
 import { Text, View, TouchableOpacity,StyleSheet } from 'react-native';
 import NavigationScreenName from '../navigation/NavigationScreenName';
-import NavigationHelper from "../navigation/NavigationHelper"
+import NavigationHelper from "../navigation/NavigationHelper";
+import AndroidDateTimePicker from "../component/common/AndroidDateTimePicker";
 
 const HomeScreen = (props) => {
+    let DatePickerRef = createRef(null);
 
-    useEffect(()=>{
-
-    });
+    const onClickedAndroidDatePicker = () => {
+        console.log("DatePickerRef",DatePickerRef);
+        if(DatePickerRef && DatePickerRef.current && typeof DatePickerRef.current.onPressDate === "function"){
+            DatePickerRef && DatePickerRef.current && DatePickerRef.current.onPressDate();
+        }
+    }
 
     return (
         <View style={styles.container}>
             <View style={{height: 200}}/>
-            <TouchableOpacity onPress={()=>{props.navigation.navigate(NavigationScreenName.TestScreen)}}>
+            <TouchableOpacity onPress={onClickedAndroidDatePicker}>
                 <View style={styles.btn}>
-                    <Text>Test</Text>
+                    <Text>Select Date</Text>
                 </View>
             </TouchableOpacity>
             <View style={{height: 40}}/>
@@ -23,6 +28,8 @@ const HomeScreen = (props) => {
                     <Text>Forgetting curve</Text>
                 </View>
             </TouchableOpacity>
+
+            <AndroidDateTimePicker ref={DatePickerRef}/>
         </View>
     )
 }

@@ -28,7 +28,7 @@ export default TestScreen = (props) => {
     return (
       <TouchableOpacity onPress={()=>{onClickedCopy(each)}}>
         <View style={[styles.blockView,{backgroundColor: color}]}>
-          <Text>{each}</Text>
+          <Text>{index+1}. {each}</Text>
         </View>
       </TouchableOpacity>
     );
