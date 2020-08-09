@@ -6,7 +6,7 @@ import CommonStyle from "../style/CommonStyle";
 import apiEnglishRed from "../API/EnglishRed/apiEnglishRed";
 import NavigationScreenName from '../navigation/NavigationScreenName';
 
-const DAY11 = "2020-07-06";
+const DAY11 = "2020-07-17";
 const InitDay = 11;
 const NOW = DateHelper.getOptionalTimeFormatString(DateHelper.currentTimeMillis());
 const DUR = DateHelper.calculateDurationMin(DAY11,NOW,"days");
