@@ -29,6 +29,13 @@ const HomeScreen = (props) => {
                 </View>
             </TouchableOpacity>
 
+            <View style={{height: 40}}/>
+            <TouchableOpacity onPress={()=>{props.navigation.navigate(NavigationScreenName.NCRecord)}}>
+                <View style={styles.btn}>
+                    <Text>NC Record</Text>
+                </View>
+            </TouchableOpacity>
+
             <AndroidDateTimePicker ref={DatePickerRef}/>
         </View>
     )
