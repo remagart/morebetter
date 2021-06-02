@@ -25,4 +25,11 @@ export default class APIManager {
             method: "GET",
         });
     }
+
+    getEnglishEveryDay = () => {
+        const url = "https://script.google.com/macros/s/AKfycbyXTpXCs2KWkxmHBycdDv01gK2ECXuosqAwWo125pHFaloLu02c7LyK651sP3bkTuX1/exec";
+        return AutoRedirectFetch("getEnglishEveryDay",`${url}`,{
+            method: "GET",
+        });
+    }
 }
