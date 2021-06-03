@@ -1,7 +1,7 @@
 const NavigationScreenName = {
     Home: "Home",
     RecordScreen: "RecordScreen",
-    TestScreen: "TestScreen",
+    DayPracticeScreen: "DayPracticeScreen",
     NCRecord: "NCRecord",
 }
 

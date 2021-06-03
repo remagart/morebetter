@@ -8,7 +8,7 @@ import NavigationScreenName from '../navigation/NavigationScreenName';
 import APIManager from '../API/APIManager';
 
 // const DAY11 = "2020-07-17";
-const DAY1 = "2021-05-20";
+const DAY1 = "2021-06-03";
 const InitDay = 1;
 const NOW = DateHelper.getOptionalTimeFormatString(DateHelper.currentTimeMillis());
 const DUR = DateHelper.calculateDurationMin(DAY1,NOW,"days");
@@ -31,10 +31,31 @@ const RecordScreen = (props) => {
 	},[]);
 
 	const onClickedBlock = (count) => {
-		let arr = dataList[count].vocabulary;
+		let arr = dataList[count];
 		requestAnimationFrame(()=>{
-			props.navigation.navigate(NavigationScreenName.TestScreen,{list: arr});
+			props.navigation.navigate(NavigationScreenName.DayPracticeScreen,{list: arr});
 		});
+	}
+
+	const calculateCurve = (day) => {
+		let currentHour = DateHelper.getOptionalTimeFormatString(NOW,"HH");
+		let sleepLater = 0;
+		if(Number(currentHour) <= 6 && Number(currentHour) >= 0){
+			sleepLater = 1;
+		}
+
+		let target = DateHelper.addDayFormatString(NOW,(0-day-sleepLater),"YYYY-MM-DD");
+		let dayFromStart = DUR-day+InitDay-sleepLater;
+		let firstword = "";
+		let firstSentence = "";
+		if ((dataList && dataList.length > 0 && dataList[dayFromStart - InitDay])) {
+			let tar = dataList[dayFromStart - InitDay];
+
+			firstword = tar.vocabulary[0] || "";
+			firstSentence = tar.sentences[0] || "";
+		}
+		
+		return { firstword, target, dayFromStart, firstSentence };
 	}
 
 	const renderTitle = () => {
@@ -46,16 +67,7 @@ const RecordScreen = (props) => {
 	}
 	
 	const renderBlock = (item) => {
-		let currentHour = DateHelper.getOptionalTimeFormatString(NOW,"HH");
-		let sleepLater = 0;
-		if(Number(currentHour) <= 6 && Number(currentHour) >= 0){
-			sleepLater = 1;
-		}
-
-		let target = DateHelper.addDayFormatString(NOW,(0-item-sleepLater),"YYYY-MM-DD");
-		let dayFromStart = DUR-item+InitDay-sleepLater;
-		let firstword = (dataList && dataList.length > 0 && dataList[dayFromStart - InitDay] && dataList[dayFromStart - InitDay].vocabulary[0]) || null;
-console.log("XX", dataList[dayFromStart - InitDay]);
+		const { firstword, target, dayFromStart, firstSentence } = calculateCurve(item);
 		if(firstword === null){
 			return(
 				<View style={styles.blockView}>
@@ -68,6 +80,7 @@ console.log("XX", dataList[dayFromStart - InitDay]);
 				<TouchableOpacity onPress={()=>{onClickedBlock(dayFromStart - InitDay)}}>
 					<View style={styles.blockView}>
 						<Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+						<Text>片語：{firstSentence}</Text>
 					</View>
 				</TouchableOpacity>
 			);
@@ -116,7 +129,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#e7acbc",
 	},
 	blockView: {
-		height: 40,
+		height: 80,
 		justifyContent: "center",
 		backgroundColor: "#FFF",
 		paddingHorizontal: 16,
