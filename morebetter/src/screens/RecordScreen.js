@@ -66,7 +66,7 @@ const RecordScreen = (props) => {
 					time: DateHelper.convertToUIFomat(StudyTimer.second - 1),
 					second: StudyTimer.second - 1,
 				}))
-			}, 0);
+			}, 1000);
 		}
 	}, [StudyTimer]);
 
