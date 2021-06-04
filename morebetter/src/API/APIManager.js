@@ -27,7 +27,7 @@ export default class APIManager {
     }
 
     getEnglishEveryDay = () => {
-        const url = "https://script.google.com/macros/s/AKfycbzm-GEIB01GKEmr6yXsH_VgCwMCYn2BhHKciYSCuPaPWAe58cZr6d0Q5ps8xFbLhi_-/exec";
+        const url = "https://script.google.com/macros/s/AKfycbzWtmPVo0mvLV_j-y7BPIYQ0jEM4UbBOtU6TMQK/exec";
         return AutoRedirectFetch("getEnglishEveryDay",`${url}`,{
             method: "GET",
         });

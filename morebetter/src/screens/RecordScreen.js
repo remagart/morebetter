@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react'
+import React, { useEffect,useState, useRef } from 'react'
 import { Text, View,StyleSheet,FlatList,TouchableOpacity } from 'react-native';
 import {Fib} from "../utils/forgetting_curve/Fibonacci";
 import DateHelper from '../utils/common/DateHelper';
@@ -6,6 +6,7 @@ import CommonStyle from "../style/CommonStyle";
 import apiEnglishRed from "../API/EnglishRed/apiEnglishRed";
 import NavigationScreenName from '../navigation/NavigationScreenName';
 import APIManager from '../API/APIManager';
+import usePrevious from '../hook/usePrevious';
 
 // const DAY11 = "2020-07-17";
 const DAY1 = "2021-06-03";
@@ -16,6 +17,11 @@ const DUR = DateHelper.calculateDurationMin(DAY1,NOW,"days");
 const RecordScreen = (props) => {
   const [dayData, setdayData] = useState([]);
 	const [dataList, setdataList] = useState([]);
+	const [StudyTimer, setStudyTimer] = useState(0);
+
+	const prevStudyTimer = usePrevious(StudyTimer);
+
+	const timer = useRef(null);
 
 	useEffect(()=>{
 		let day = Fib(DUR);
@@ -27,8 +33,42 @@ const RecordScreen = (props) => {
 
 			setdataList(list.data);
 		}
+
 		fetchData();
+
+		const now = DateHelper.currentTimeMillis();
+		const now_H = DateHelper.getOptionalTimeFormatString(now, "HH");
+		let now_Date = DateHelper.getOptionalTimeFormatString(now, "YYYY-MM-DD");
+
+		if (now_H > 6 && now_H < 24) {
+			now_Date = DateHelper.addDayFormatString(now, 1, "YYYY-MM-DD");
+		}
+		const target = DateHelper.getOptionalTimeFormatString(`${now_Date} 06:00`);
+		const sec = DateHelper.calculateDurationMin(now, target, "second");
+		const dur = DateHelper.convertToUIFomat(sec);
+		setStudyTimer({
+			time: dur,
+			second: sec,
+		});
+		
+		return () => {
+			if (timer.current !== null) {
+				clearInterval(timer.current);
+				timer.current = null;
+			}
+		}
 	},[]);
+
+	useEffect(() => {
+		if (prevStudyTimer === 0 && StudyTimer.second > 0) {
+			timer.current = setInterval(() => {
+				setStudyTimer((StudyTimer) => ({
+					time: DateHelper.convertToUIFomat(StudyTimer.second - 1),
+					second: StudyTimer.second - 1,
+				}))
+			}, 0);
+		}
+	}, [StudyTimer]);
 
 	const onClickedBlock = (count) => {
 		let arr = dataList[count];
@@ -62,6 +102,7 @@ const RecordScreen = (props) => {
 		return (
 			<View style={styles.titleView}>
 				<Text style={styles.titleTxt}>已經開始第 {DUR} 天了</Text>
+				{(StudyTimer !== 0) && <Text style={styles.titleTxtTimer}>還剩下 {StudyTimer.time}</Text>}
 			</View>
 		);
 	}
@@ -122,11 +163,16 @@ const styles = StyleSheet.create({
 		...CommonStyle.textBody2,
 		fontWeight: "bold",
 	},
+	titleTxtTimer:{
+		...CommonStyle.textCaption,
+	},
 	titleView: {
 		height: 50,
 		alignItems: "center",
-		justifyContent: "center",
+		justifyContent: "space-between",
 		backgroundColor: "#e7acbc",
+		flexDirection: "row",
+		paddingHorizontal: 16,
 	},
 	blockView: {
 		height: 80,

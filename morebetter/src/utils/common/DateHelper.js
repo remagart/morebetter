@@ -43,4 +43,27 @@ export default class DateHelper{
         return dur;
     }
 
+    static convertToUIFomat = (totalSecs) => {
+			if (typeof totalSecs === "string") {
+				if (isNaN(Number(totalSecs))) return totalSecs;
+				totalSecs = Number(totalSecs);
+			}
+			else if (typeof totalSecs !== "number") return totalSecs;
+	
+			totalSecs = parseInt(totalSecs, 10);
+	
+			let seconds = totalSecs % 60;
+			let hour = Math.floor(totalSecs / (60 * 60));
+			let minutes = Math.floor(totalSecs / 60) - hour * 60;
+	
+			seconds = seconds.toFixed(0); // To avoid float
+	
+			hour = hour.toString().length === 1 ? `0${hour}` : hour;
+			minutes = minutes.toString().length === 1 ? `0${minutes}` : minutes;
+			seconds = seconds.toString().length === 1 ? `0${seconds}` : seconds;
+			return (
+				`${hour <= 0 ? "" : `${hour}:`}${minutes < 0 ? "00" : minutes}:${seconds < 0 ? "00" : seconds}`
+			);
+		}
+
 }
