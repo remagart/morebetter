@@ -1,4 +1,4 @@
-import React, { useEffect,useState, useRef } from 'react'
+import React, { useEffect,useState, useRef, useCallback } from 'react'
 import { Text, View,StyleSheet,FlatList,TouchableOpacity } from 'react-native';
 import {Fib} from "../utils/forgetting_curve/Fibonacci";
 import DateHelper from '../utils/common/DateHelper';
@@ -7,6 +7,7 @@ import apiEnglishRed from "../API/EnglishRed/apiEnglishRed";
 import NavigationScreenName from '../navigation/NavigationScreenName';
 import APIManager from '../API/APIManager';
 import usePrevious from '../hook/usePrevious';
+import GirlModule from '../component/girl/GirlModule';
 
 // const DAY11 = "2020-07-17";
 const DAY1 = "2021-06-03";
@@ -18,6 +19,7 @@ const RecordScreen = (props) => {
   const [dayData, setdayData] = useState([]);
 	const [dataList, setdataList] = useState([]);
 	const [StudyTimer, setStudyTimer] = useState(0);
+	const [ChangePic, setChangePic] = useState(1);
 
 	const prevStudyTimer = usePrevious(StudyTimer);
 
@@ -29,7 +31,7 @@ const RecordScreen = (props) => {
 
 		const fetchData = async()=>{
 			let list = await new APIManager().getEnglishEveryDay().then((response)=>response.json());
-			console.log("list",list);
+			// console.log("list",list);
 
 			setdataList(list.data);
 		}
@@ -73,6 +75,7 @@ const RecordScreen = (props) => {
 	const onClickedBlock = (count) => {
 		let arr = dataList[count];
 		requestAnimationFrame(()=>{
+			setChangePic(ChangePic + 1);
 			props.navigation.navigate(NavigationScreenName.DayPracticeScreen,{list: arr});
 		});
 	}
@@ -128,22 +131,27 @@ const RecordScreen = (props) => {
 		}
 	}
 
+	const renderPic = () => <GirlModule needChange={ChangePic}/>;
+
 	const renderList = () => {
 		return(
-			<FlatList 
-				ListHeaderComponent={renderTitle()}
-				keyExtractor = {(item,index)=> "RecordScreen"+String(item)}
-				data = {dayData}
-				extraData = {dayData}
-				renderItem = {({item})=>{
-					return(
-						<View>
-							{renderBlock(item)}
-							<View style={styles.line}/>
-						</View>
-					)
-				}}
-			/>
+			<>
+				<FlatList 
+					ListHeaderComponent={renderTitle()}
+					keyExtractor = {(item,index)=> "RecordScreen"+String(item)}
+					data = {dayData}
+					ListFooterComponent={renderPic()}
+					renderItem = {({item})=>{
+						return(
+							<View>
+								{renderBlock(item)}
+								<View style={styles.line}/>
+							</View>
+						)
+					}}
+				/>
+				
+			</>
 		);
 	}
 
@@ -175,7 +183,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 	},
 	blockView: {
-		height: 80,
+		paddingVertical: 16,
 		justifyContent: "center",
 		backgroundColor: "#FFF",
 		paddingHorizontal: 16,

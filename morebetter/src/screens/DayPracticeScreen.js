@@ -44,7 +44,7 @@ export default DayPracticeScreen = (props) => {
       paddingVertical: 16,
     } : {};
     return (
-      <TouchableOpacity onPress={()=>{onClickedCopy(each)}}>
+      <TouchableOpacity onPress={() => { ToastAndroid.show("請長按",ToastAndroid.SHORT); }} onLongPress={()=>{onClickedCopy(each)}}>
         <View style={[styles.blockView,{backgroundColor: color, ...addStyle}]}>
           <Text>{index+1}. {each}</Text>
         </View>
