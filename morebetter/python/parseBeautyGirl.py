@@ -1,3 +1,7 @@
+###
+# Ref: https://github.com/yotsuba1022/web-crawler-practice/blob/master/ch5/ptt_beauty_crawler.py
+# description: 抓取表特版某月份推文數高於60的正妹
+###
 import requests
 import time
 from bs4 import BeautifulSoup
