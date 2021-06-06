@@ -71,8 +71,11 @@ def save(img_urls, title, count, arr = [], pttUrl = ""):
             img_url = img_url.split('//')[0] + '//i.' + img_url.split('//')[1]
         # if not img_url.endswith('.jpg'):
         #     img_url += '.jpg'
-        # if not img_url.endswith('.jpg') and not img_url.endswith('.png') and not img_url.endswith('.gif'):
-        #   img_url += '.png'
+        if not img_url.endswith('.jpg') \
+          and not img_url.endswith('.png') \
+          and not img_url.endswith('.gif') \
+          and not img_url.endswith('.jp'):
+          img_url += '.png'
           
         file_name = count
         count = count + 1
@@ -87,10 +90,11 @@ def save(img_urls, title, count, arr = [], pttUrl = ""):
         print(e)
 
 def main():
-    URL_INDEX = 3666  # require (需至網頁確認網址)
+    # URL_INDEX = 3666  # require (需至網頁確認網址) eg. 2021/5
+    URL_INDEX = 3548
     BASE_URL = f"/bbs/Beauty/index{URL_INDEX}.html"
     YEAR = 2021       # require
-    MONTH = "5/"      # require (記得要slash)
+    MONTH = "1/"      # require (記得要slash)
     INIT_DAY = "31"   # require (考慮月份最大)
     
     END_DAY = 1
@@ -100,23 +104,27 @@ def main():
       # date = time.strftime("%m/%d").lstrip('0')  # 今日
       date = MONTH + INIT_DAY
       current_articles = None
+      final_prev_url = ""
       for day in range(int(INIT_DAY),END_DAY,-1):
         if day < 10:
           date = MONTH + "0" + str(day)
         else:
           date = MONTH + str(day)
-        print(f"RRR {date}")
         
         if current_articles:
+          print(f"RRR1 {date}")
           while current_articles:
             articles += current_articles
             current_page = get_web_content(PTT_URL + prev_url)
             current_articles, prev_url = get_articles(current_page, date)
+            final_prev_url = prev_url
         else:
+          print(f"RRR2 {date}")
           current_articles, prev_url = get_articles(current_page, date)
+          final_prev_url = prev_url
           if not current_articles:
             continue
-        
+      print(f"finall_prev_url: {final_prev_url}")  
       count = 0
       
       articles_60 = []

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { Text, View, StyleSheet, Image, Dimensions, TouchableOpacity, ActivityIndicator, Linking, ToastAndroid } from 'react-native'
-import data from "../../../python/data_2021_5.json";
+import { data } from "./dataCollection";
 import usePrevious from '../../hook/usePrevious';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("screen");
@@ -23,7 +23,8 @@ export default function GirlModule({ needChange = 1 }) {
 
     if (data[num]) {
       let u = data[num].url;
-      while (u === "") {
+      const reg = /.*gif$/i;
+      while (u === "" || reg.test(u) === true) {
         num =  (Math.random() * dataLength.current).toFixed();
         u = data[num].url;
       }
