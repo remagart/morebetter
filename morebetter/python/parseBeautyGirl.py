@@ -58,7 +58,7 @@ def parse(dom):
             img_urls.append(link['href'])
     return img_urls
 
-def save(img_urls, title, count, arr = []):
+def save(img_urls, title, count, arr = [], pttUrl = ""):
   if img_urls:
     try:
       # folder_name = title.strip()
@@ -78,7 +78,8 @@ def save(img_urls, title, count, arr = []):
         count = count + 1
         arr.append({
           "id": file_name,
-          "url": img_url
+          "url": img_url,
+          "pttUrl": pttUrl,
         })
       return arr
         # urllib.request.urlretrieve(img_url, os.path.join(folder_name, file_name))
@@ -129,14 +130,16 @@ def main():
       for article in articles_60:
         print("loading...")
         # print('Collecting beauty from:', article)
-        page = get_web_content(PTT_URL + article['href'])
+        ptt_url = PTT_URL + article['href']
+        page = get_web_content(ptt_url)
         if page:
           img_urls = parse(page)
           # print(img_urls)
-          output_arr = save(img_urls, article['title'], count, output_arr)
+          output_arr = save(img_urls, article['title'], count, output_arr, ptt_url)
           article['num_image'] = len(img_urls)
           count += len(img_urls)
-      
+          
+      # print(f"output: {output_arr}")
       file_name = f"data_{YEAR}_{MONTH.split('/')[0]}.json"
       with open(f"{file_name}", 'w', encoding='utf-8') as file:
         json.dump(output_arr, file, indent=2, sort_keys=True, ensure_ascii=False)

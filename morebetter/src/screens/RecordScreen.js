@@ -131,9 +131,10 @@ const RecordScreen = (props) => {
 					<View style={styles.blockView}>
 						<View style={{ flexDirection: "row" }}>
 							{(idx === 0) ? renderTag() : null}
-							<Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+							<Text style={[CommonStyle.textCaption, { color: "purple"}]}>{target}: DAY{dayFromStart}:</Text>
 						</View>
-						
+
+						<Text>單字：{firstword}</Text>
 						<Text>片語：{firstSentence}</Text>
 					</View>
 				</TouchableOpacity>
