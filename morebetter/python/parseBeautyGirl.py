@@ -71,8 +71,8 @@ def save(img_urls, title, count, arr = [], pttUrl = ""):
             img_url = img_url.split('//')[0] + '//i.' + img_url.split('//')[1]
         # if not img_url.endswith('.jpg'):
         #     img_url += '.jpg'
-        if not img_url.endswith('.jpg') and not img_url.endswith('.png') and not img_url.endswith('.gif'):
-          img_url += '.png'
+        # if not img_url.endswith('.jpg') and not img_url.endswith('.png') and not img_url.endswith('.gif'):
+        #   img_url += '.png'
           
         file_name = count
         count = count + 1
