@@ -5,6 +5,8 @@ import APIManager from '../API/APIManager';
 import CommonStyle from '../style/CommonStyle';
 import Clipboard from "@react-native-community/clipboard";
 import StringHelper from '../utils/common/StringHelper';
+import GirlModule from '../component/girl/GirlModule';
+import usePrevious from '../hook/usePrevious';
 
 const TAB_SUM = {
   voc: "voc",
@@ -15,6 +17,9 @@ export default DayPracticeScreen = (props) => {
   const [dataList, setdataList] = useState([]);
   const [SentenceList, setSentenceList] = useState([]);
   const [CurrentTab, setCurrentTab] = useState(TAB_SUM.voc);
+  const [NeedChange, setNeedChange] = useState(1);
+
+  const prevCurrentTab = usePrevious(CurrentTab);
 
   useEffect(()=>{
     const list = props.route.params.list;
@@ -23,6 +28,12 @@ export default DayPracticeScreen = (props) => {
     setSentenceList(sentences);
 
   },[]);
+
+  useEffect(() => {
+    if (prevCurrentTab && CurrentTab && (prevCurrentTab !== CurrentTab)) {
+      setNeedChange(NeedChange + 1);
+    }
+  }, [CurrentTab]);
 
   const onClickedCopy = (txt) => {
     if(txt && typeof txt === "string"){
@@ -74,19 +85,16 @@ export default DayPracticeScreen = (props) => {
     )
   }
 
+  const renderGirl = () => (<GirlModule needChange={NeedChange} />);
+
   return (
     <View style={styles.container}>
       {renderTab()}
       <FlatList 
         data={(CurrentTab === TAB_SUM.voc) ? dataList : SentenceList}
         keyExtractor={(item,index)=> "DayPracticeScreen" + String(index)}
-        renderItem = {({item,index})=> {
-          return(
-            <View>
-                {renderBlock(item,index,(CurrentTab === TAB_SUM.voc))}
-            </View>
-          )
-        }}
+        renderItem={({item,index})=> renderBlock(item,index,(CurrentTab === TAB_SUM.voc))}
+        ListFooterComponent={renderGirl()}
       />
     </View>
   );

@@ -36,10 +36,11 @@ export default function GirlModule({ needChange = 1 }) {
         setPicSource(url);
       });
     };
+    setPicSource("");
     const u = randomPic();
     console.log("loading...", u);
     loading(u);
-  });
+  },[ PicSource ]);
 
   useEffect(() => {
     const count = (data) ? data.length : 0;
@@ -57,7 +58,6 @@ export default function GirlModule({ needChange = 1 }) {
   }, [needChange]);
 
   const onClickedChangePic = () => {
-    setPicSource("");
     loadinPic();
   }
 

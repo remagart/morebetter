@@ -101,16 +101,22 @@ const RecordScreen = (props) => {
 		return { firstword, target, dayFromStart, firstSentence };
 	}
 
+	const renderTag = () => (
+		<View style={styles.tag}>
+			<Text style={styles.tagTxt}>今日</Text>
+		</View>
+	);
+
 	const renderTitle = () => {
 		return (
 			<View style={styles.titleView}>
-				<Text style={styles.titleTxt}>已經開始第 {DUR} 天了</Text>
+				<Text style={styles.titleTxt}>已經記憶 {DUR} 天了</Text>
 				{(StudyTimer !== 0) && <Text style={styles.titleTxtTimer}>還剩下 {StudyTimer.time}</Text>}
 			</View>
 		);
 	}
 	
-	const renderBlock = (item) => {
+	const renderBlock = (item, idx) => {
 		const { firstword, target, dayFromStart, firstSentence } = calculateCurve(item);
 		if(firstword === null){
 			return(
@@ -123,7 +129,11 @@ const RecordScreen = (props) => {
 			return (
 				<TouchableOpacity onPress={()=>{onClickedBlock(dayFromStart - InitDay)}}>
 					<View style={styles.blockView}>
-						<Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+						<View style={{ flexDirection: "row" }}>
+							{(idx === 0) ? renderTag() : null}
+							<Text>{target}: DAY{dayFromStart}: {firstword}</Text>
+						</View>
+						
 						<Text>片語：{firstSentence}</Text>
 					</View>
 				</TouchableOpacity>
@@ -141,10 +151,10 @@ const RecordScreen = (props) => {
 					keyExtractor = {(item,index)=> "RecordScreen"+String(item)}
 					data = {dayData}
 					ListFooterComponent={renderPic()}
-					renderItem = {({item})=>{
+					renderItem = {({item, index})=>{
 						return(
 							<View>
-								{renderBlock(item)}
+								{renderBlock(item, index)}
 								<View style={styles.line}/>
 							</View>
 						)
@@ -192,6 +202,20 @@ const styles = StyleSheet.create({
 		backgroundColor: CommonStyle.separatorColor.color,
 		height: 1,
 	},
+	tag: {
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "yellow",
+		paddingHorizontal: 4,
+		// paddingVertical: 2,
+		borderRadius: 8,
+		marginRight: 8,
+	},
+	tagTxt: {
+		...CommonStyle.textSmallest,
+		color: "rgba(0,0,0,0.8)",
+		fontWeight: "bold",
+	}
 })
 
 
