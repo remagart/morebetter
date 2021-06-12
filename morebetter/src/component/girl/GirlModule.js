@@ -39,11 +39,11 @@ export default function GirlModule({ needChange = 1 }) {
     if (data[num]) {
       let u = data[num].url;
       let ptt_u = data[num].pttUrl;
-      const reg = /.*gif$/i;
-      while (u === "" || reg.test(u) === true
-      || (dislikeArr && typeof dislikeArr === "object" && (dislikeArr.length > 0) 
-        && dislikeArr.indexOf(u) !== -1
-        && dislikeArr.indexOf(ptt_u) !== -1)) {
+      const reg = /.*(jpg|png)$/i;
+      reg.lastIndex = 0;
+      while (u === "" || reg.test(u) === false
+      || ((dislikeArr && typeof dislikeArr === "object" && (dislikeArr.length > 0) 
+        && ( dislikeArr.indexOf(u) !== -1 || dislikeArr.indexOf(ptt_u) !== -1)))) {
         num =  (Math.random() * dataLength.current).toFixed();
         u = data[num].url;
         ptt_u = data[num].pttUrl;
