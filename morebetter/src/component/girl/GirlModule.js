@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
-import { Text, View, StyleSheet, Image, Dimensions, TouchableOpacity, ActivityIndicator, Linking, ToastAndroid } from 'react-native'
+import {
+  Text, View, StyleSheet, Image, Dimensions, TouchableOpacity,
+  ActivityIndicator, Linking, ToastAndroid, PanResponder,
+} from 'react-native'
 import { data } from "./dataCollection";
 import usePrevious from '../../hook/usePrevious';
 import CommonStyle from '../../style/CommonStyle';
@@ -12,7 +15,7 @@ const HEIGHT = SCREEN_WIDTH * 16 / 9;
 const INIT_URL = "https://img.analisa.io/instagram/post/170127475_1719642474883060_2566193789365539707_n.jpg";
 const DISLIKE_TAG = "@dislike_key";
 
-export default function GirlModule({ needChange = 1 }) {
+export default function GirlModule({ needChange = 1, scrollRef = null }) {
   
   const [PicSource, setPicSource] = useState("");
   const [PttUrl, setPttUrl] = useState("");
@@ -21,7 +24,13 @@ export default function GirlModule({ needChange = 1 }) {
 
   const clickedTimer = useRef(null);
   const isClickedOnce = useRef(false);
+  const isLoadingPic = useRef(false);
   const historyList = useRef([]);
+  
+  const locationBegin = useRef([0,0]); // [beginX, beginY]
+  const timestampBegin = useRef(0);
+  const gestureControl = useRef({ panHandlers: {} });
+  const isConnectingPtt = useRef(false);
 
   async function getDislikeList() {
     let ori = await AsyncStorage.getItem("@dislike_key");
@@ -58,14 +67,15 @@ export default function GirlModule({ needChange = 1 }) {
   const loadinPic = useCallback(() => {
     const loading = async (url, ptt) => {
       await Image.prefetch(url).then((e) => {
-        console.log("Image prefetch", e);
         if (typeof historyList.current === "object")
           historyList.current.push({ url, ptt });
 
         setPicSource(url);
         setPttUrl(ptt);
-
+        console.log("Image prefetch", e, url, ptt);
         isClickedOnce.current = false;
+      }).finally(() => {
+        isLoadingPic.current = false; // Close it so that can load another pic
       });
     };
 
@@ -76,11 +86,17 @@ export default function GirlModule({ needChange = 1 }) {
       loading(u.url, u.ptt);
     }
 
-    setPicSource("");
-    judgeDislike();
+    if (isLoadingPic.current === false) {
+      isLoadingPic.current = true;
+      setPicSource("");
+      judgeDislike();
+    }
+    else console.log("Already loading pic...");
+    
   },[ PicSource ]);
 
   useEffect(() => {
+    gestureControl.current = gestureConstruct();
     const count = (data) ? data.length : 0;
     dataLength.current = count;
     
@@ -121,11 +137,16 @@ export default function GirlModule({ needChange = 1 }) {
   }
 
   const onClickedConnectPtt = () => {
-    console.log("on Long Clicked...", PttUrl, isClickedOnce.current);
-    if (PttUrl) {
-      Linking.openURL(PttUrl).then(() => {
-        ToastAndroid.show("前往ptt連結", ToastAndroid.SHORT);
-      });
+    if (isConnectingPtt.current === false) {
+      isConnectingPtt.current = true;
+      console.log("on Long Clicked...", PttUrl, isClickedOnce.current);
+      if (PttUrl) {
+        Linking.openURL(PttUrl).then(() => {
+          ToastAndroid.show("前往ptt連結", ToastAndroid.SHORT);
+        }).finally(() => {
+          isConnectingPtt.current = false;
+        });
+      }
     }
   }
 
@@ -187,22 +208,101 @@ export default function GirlModule({ needChange = 1 }) {
     </TouchableOpacity>
   );
 
+  const gestureConstruct = useCallback(() => {
+    return PanResponder.create({
+      // 要求成為響應者
+      // onStartShouldSetPanResponder: (evt, gestureState) => true,
+      // onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        console.log("onMoveShouldSetPanResponderCapture");
+        timestampBegin.current = evt.nativeEvent.timestamp;
+        return true;
+      },
+    
+      onPanResponderGrant: (evt, gestureState) => {
+        // 开始手势操作。给用户一些视觉反馈，让他们知道发生了什么事情！
+        // console.log("onPanResponderGrant", evt.nativeEvent, gestureState);
+        // gestureState.{x,y} 现在会被设置为0
+        locationBegin.current[0]  = parseInt(evt.nativeEvent.locationX);
+        locationBegin.current[1] = parseInt(evt.nativeEvent.locationY);
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // 最近一次的移动距离为gestureState.move{X,Y}
+        // console.log("Finger move", gestureState.dx, gestureState.dy);
+        // console.log("Finger move time", evt.nativeEvent.timestamp);
+        if ((evt.nativeEvent.timestamp - timestampBegin.current) / 1000 > 1) {
+          onClickedConnectPtt();
+        }
+        // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        // 用户放开了所有的触摸点，且此时视图已经成为了响应者。
+        // 一般来说这意味着一个手势操作已经成功完成。
+        console.log("onPanResponderRelease");
+        const obj = evt.nativeEvent;
+        const endX = parseInt(obj.locationX);
+        const endY = parseInt(obj.locationY);
+        const beginX = locationBegin.current[0];
+        const beginY = locationBegin.current[1];
+        const duration = (obj.timestamp - timestampBegin.current) / 1000;
+        console.log("time: ", duration);
+        if (duration < 1) {
+          const moveX = Math.abs(endX - beginX);
+          if (moveX > 50) {
+            let result = (Math.abs(endX-beginX) > Math.abs(endY-beginY));
+            if (result === true) {
+              console.log("左右", beginX, endX);
+              if (endX > beginX) {
+                console.log('向右'); onClickedPrevPic(); 
+              } else console.log('向左');
+            }
+            else console.log("上下");
+            
+          }
+          else {
+            onClickedChangePic();
+          }
+        }
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        // 另一个组件已经成为了新的响应者，所以当前手势将被取消。
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        // 返回一个布尔值，决定当前组件是否应该阻止原生组件成为JS响应者
+        // 默认返回true。目前暂时只支持android。
+        return true;
+      },
+    });
+  }, [ PttUrl, PicSource ]);
+
   return (
-    <View
-      style={styles.container}
-      // onStartShouldSetResponder={(e) => { console.log("AAA", e.nativeEvent); return true; }}
-      // onResponderGrant={(e) => { console.log("BBB", e.nativeEvent); }}
-      // onResponderMove={(e) => { console.log("CCC", e.nativeEvent); }}
-      // onResponderRelease={(e) => { console.log("DDD", e.nativeEvent); }}
-    >
+    <View style={styles.container}>
       <View style={styles.btnArea}>
         {renderBtn(onClickedDislike, "不喜歡", "dislike2", CommonStyle.errMsgColor.color)}
         {renderBtn(onClickedDislikeForever, "不喜歡這系列", "frowno", "red")}
-        {renderBtn(onClickedPrevPic, "錯過的美好", "export2", "#0000ff")}
+        {/* {renderBtn(onClickedPrevPic, "錯過的美好", "export2", "#0000ff")} */}
       </View>
-      <TouchableOpacity onPress={onClickedChangePic} onLongPress={onClickedConnectPtt}>
-        <View style={styles.shape}>
-          {(PicSource !== "") ? renderGirl() : renderINIT()}
+
+      <View style={{ flex: 1 }} {...gestureConstruct().panHandlers}>
+        {/* <TouchableOpacity onPress={onClickedChangePic} onLongPress={onClickedConnectPtt}> */}
+          <View style={styles.shape}>
+            {(PicSource !== "") ? renderGirl() : renderINIT()}
+          </View>
+        {/* </TouchableOpacity> */}
+      </View>
+
+      <TouchableOpacity 
+        style={{ backgroundColor: "#FFFF99", height: 50, width: "100%", justifyContent: "center" }} 
+        onPress={() => {
+          if (scrollRef && typeof scrollRef.scrollToOffset === "function") {
+            scrollRef.scrollToOffset(0);
+          }
+        }}
+      >
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Text>該背單字囉！</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -244,7 +344,8 @@ const styles = StyleSheet.create({
   btnArea: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 8,
+    paddingBottom: 8,
+    backgroundColor: "#FFFF99"
   },
 })
 

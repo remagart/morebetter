@@ -20,6 +20,8 @@ const RecordScreen = (props) => {
 	const [dataList, setdataList] = useState([]);
 	const [StudyTimer, setStudyTimer] = useState(0);
 	const [ChangePic, setChangePic] = useState(1);
+	
+	const FlatListRef = useRef(null);
 
 	const prevStudyTimer = usePrevious(StudyTimer);
 
@@ -142,12 +144,13 @@ const RecordScreen = (props) => {
 		}
 	}
 
-	const renderPic = () => <GirlModule needChange={ChangePic}/>;
+	const renderPic = () => <GirlModule needChange={ChangePic} scrollRef={FlatListRef.current}/>;
 
 	const renderList = () => {
 		return(
 			<>
-				<FlatList 
+				<FlatList
+					ref={FlatListRef}
 					ListHeaderComponent={renderTitle()}
 					keyExtractor = {(item,index)=> "RecordScreen"+String(item)}
 					data = {dayData}

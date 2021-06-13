@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect,useState, useRef } from 'react';
 import { View, Text,FlatList,StyleSheet,TouchableOpacity,ToastAndroid, Linking } from 'react-native';
 import Ankidroid from "react-native-ankidroid";
 import APIManager from '../API/APIManager';
@@ -20,6 +20,8 @@ export default DayPracticeScreen = (props) => {
   const [NeedChange, setNeedChange] = useState(1);
 
   const prevCurrentTab = usePrevious(CurrentTab);
+
+  const FlatListRef = useRef(null)
 
   useEffect(()=>{
     const list = props.route.params.list;
@@ -86,12 +88,13 @@ export default DayPracticeScreen = (props) => {
     )
   }
 
-  const renderGirl = () => (<GirlModule needChange={NeedChange} />);
+  const renderGirl = () => (<GirlModule needChange={NeedChange} scrollRef={FlatListRef.current}/>);
 
   return (
     <View style={styles.container}>
       {renderTab()}
-      <FlatList 
+      <FlatList
+        ref={FlatListRef}
         data={(CurrentTab === TAB_SUM.voc) ? dataList : SentenceList}
         keyExtractor={(item,index)=> "DayPracticeScreen" + String(index)}
         renderItem={({item,index})=> renderBlock(item,index,(CurrentTab === TAB_SUM.voc))}
