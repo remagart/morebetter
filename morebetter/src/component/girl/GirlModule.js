@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import {
   Text, View, StyleSheet, Image, Dimensions, TouchableOpacity,
-  ActivityIndicator, Linking, ToastAndroid, PanResponder,
+  ActivityIndicator, Linking, ToastAndroid, PanResponder, PixelRatio,
 } from 'react-native'
 import { data } from "./dataCollection";
 import usePrevious from '../../hook/usePrevious';
@@ -208,16 +208,29 @@ export default function GirlModule({ needChange = 1, scrollRef = null }) {
     </TouchableOpacity>
   );
 
-  const gestureConstruct = useCallback(() => {
+  const renderMark = () => (
+    <View style={{ height: 5, width: "100%", paddingLeft: SCREEN_WIDTH / 3 }}>
+      <View style={{ backgroundColor: "red", width: 10, height: 5 }} />
+    </View>
+  );
+
+  const gestureConstruct = useCallback((scroll) => {
     return PanResponder.create({
       // 要求成為響應者
-      // onStartShouldSetPanResponder: (evt, gestureState) => true,
-      // onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        console.log("onMoveShouldSetPanResponderCapture");
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        console.log("2onStartShouldSetPanResponder");return false;
+      },
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => {
+        console.log("1onStartShouldSetPanResponderCapture");
+        if (evt.nativeEvent.locationX < (SCREEN_WIDTH / 3)) return false;
         timestampBegin.current = evt.nativeEvent.timestamp;
         return true;
+      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        console.log("4onMoveShouldSetPanResponder");return false;
+      },
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        console.log("3onMoveShouldSetPanResponderCapture");return false;
       },
     
       onPanResponderGrant: (evt, gestureState) => {
@@ -277,6 +290,21 @@ export default function GirlModule({ needChange = 1, scrollRef = null }) {
     });
   }, [ PttUrl, PicSource ]);
 
+  const renderBottom = () => (
+    <TouchableOpacity 
+      style={{ backgroundColor: "#FFFF99", height: 50, width: "100%", justifyContent: "center" }} 
+      onPress={() => {
+        if (scrollRef && typeof scrollRef.scrollToOffset === "function") {
+          scrollRef.scrollToOffset(0);
+        }
+      }}
+    >
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Text>該背單字囉！</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.btnArea}>
@@ -284,8 +312,9 @@ export default function GirlModule({ needChange = 1, scrollRef = null }) {
         {renderBtn(onClickedDislikeForever, "不喜歡這系列", "frowno", "red")}
         {/* {renderBtn(onClickedPrevPic, "錯過的美好", "export2", "#0000ff")} */}
       </View>
+      {renderMark()}
 
-      <View style={{ flex: 1 }} {...gestureConstruct().panHandlers}>
+      <View style={{ flex: 1 }} {...gestureConstruct(scrollRef).panHandlers}>
         {/* <TouchableOpacity onPress={onClickedChangePic} onLongPress={onClickedConnectPtt}> */}
           <View style={styles.shape}>
             {(PicSource !== "") ? renderGirl() : renderINIT()}
@@ -293,18 +322,8 @@ export default function GirlModule({ needChange = 1, scrollRef = null }) {
         {/* </TouchableOpacity> */}
       </View>
 
-      <TouchableOpacity 
-        style={{ backgroundColor: "#FFFF99", height: 50, width: "100%", justifyContent: "center" }} 
-        onPress={() => {
-          if (scrollRef && typeof scrollRef.scrollToOffset === "function") {
-            scrollRef.scrollToOffset(0);
-          }
-        }}
-      >
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <Text>該背單字囉！</Text>
-        </View>
-      </TouchableOpacity>
+      {renderMark()}
+      {renderBottom()}
     </View>
   )
 }
