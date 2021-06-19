@@ -18,6 +18,7 @@ export default CommonStyle = StyleSheet.create({
     text_light: {color: "rgba(0,0,0,0.45)"},
     separatorColor: {color: "#E6E6E6"},   // rgb(230,230,230)
     errMsgColor: {color: "#E07030"},    // rgb(rgb(150,64,48))
+    blue: {color: "#0000ff"},
     textH1:{
         fontSize: 28,
         lineHeight: 37,

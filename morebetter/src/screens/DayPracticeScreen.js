@@ -1,4 +1,4 @@
-import React, { useEffect,useState, useRef } from 'react';
+import React, { useEffect,useState, useRef, useLayoutEffect } from 'react';
 import { View, Text,FlatList,StyleSheet,TouchableOpacity,ToastAndroid, Linking } from 'react-native';
 import Ankidroid from "react-native-ankidroid";
 import APIManager from '../API/APIManager';
@@ -7,6 +7,8 @@ import Clipboard from "@react-native-community/clipboard";
 import StringHelper from '../utils/common/StringHelper';
 import GirlModule from '../component/girl/GirlModule';
 import usePrevious from '../hook/usePrevious';
+import IconIonicons from "react-native-vector-icons/Ionicons";
+import DailyMission from "../component/modal/DailyMission";
 
 const TAB_SUM = {
   voc: "voc",
@@ -14,6 +16,7 @@ const TAB_SUM = {
 };
 
 export default DayPracticeScreen = (props) => {
+  const { navigation } = props;
   const [dataList, setdataList] = useState([]);
   const [SentenceList, setSentenceList] = useState([]);
   const [CurrentTab, setCurrentTab] = useState(TAB_SUM.voc);
@@ -21,7 +24,20 @@ export default DayPracticeScreen = (props) => {
 
   const prevCurrentTab = usePrevious(CurrentTab);
 
-  const FlatListRef = useRef(null)
+  const FlatListRef = useRef(null);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => {ToastAndroid.show("aaa", ToastAndroid.SHORT)}}>
+          <View style={{ width: 32 + 24, height: 32, paddingRight: 12, justifyContent: "center", alignItems: "center" }}>
+            <IconIonicons name="game-controller-outline" size={24} color={CommonStyle.blue.color}/>
+          </View>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
 
   useEffect(()=>{
     const list = props.route.params.list;
@@ -100,6 +116,7 @@ export default DayPracticeScreen = (props) => {
         renderItem={({item,index})=> renderBlock(item,index,(CurrentTab === TAB_SUM.voc))}
         ListFooterComponent={renderGirl()}
       />
+      <DailyMission />
     </View>
   );
 }
