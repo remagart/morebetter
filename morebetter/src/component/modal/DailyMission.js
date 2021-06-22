@@ -42,6 +42,7 @@ export default function DailyMission ({
   }, []);
 
   const pickWord = useCallback(() => {
+    // console.log(RestWordList);
     if (RestWordList) {
       const rate = Math.random();
       const radnum = Math.floor(rate * RestWordList.length);
@@ -90,11 +91,14 @@ export default function DailyMission ({
       pickWord();
       doTimer();
     }
+    else if (Counter === 0 && RestWordList && RestWordList.length === 0) {
+      onCloseModal(true);
+    }
   }, [Counter]);
 
-  const onCloseModal = () => {
+  const onCloseModal = (isFinish) => {
     init();
-    closeModal();
+    closeModal(isFinish);
   };
 
   const renderClose = () => (

@@ -9,6 +9,7 @@ import GirlModule from '../component/girl/GirlModule';
 import usePrevious from '../hook/usePrevious';
 import IconIonicons from "react-native-vector-icons/Ionicons";
 import DailyMission from "../component/modal/DailyMission";
+import ToastComponent from '../component/common/ToastComponent';
 
 const TAB_SUM = {
   voc: "voc",
@@ -55,8 +56,11 @@ export default DayPracticeScreen = (props) => {
     }
   }, [CurrentTab]);
 
-  const onCloseGame = () => {
+  const onCloseGame = (isFinish = false) => {
     setisVisibleGame(false);
+    if (isFinish === true) {
+      ToastComponent.showToast("恭喜完成！", ToastComponent.STATUS_TOAST.SUCCESS);
+    }
   }
 
   const onOpenGame = () => {
