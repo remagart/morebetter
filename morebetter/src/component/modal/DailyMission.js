@@ -1,25 +1,83 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Modal } from "react-native-paper";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import CommonStyle from '../../style/CommonStyle';
 import * as Progress from 'react-native-progress';
+import usePrevious from '../../hook/usePrevious';
 
 const TotalSec = 30;
 
-export default function DailyMission () {
+export default function DailyMission ({
+  isVisible = false,
+  closeModal = () => {},
+  data: OriginData = [],
+}) {
   const [Counter, setCounter] = useState(TotalSec);
   const Timer = useRef(null);
+  const previsVisible = usePrevious(isVisible);
+  const [NowWord, setNowWord] = useState("");
+  const [RestWordList, setRestWordList] = useState([]);
 
-  useEffect(() => {
+  const prevRestWordList = usePrevious(RestWordList);
+
+  const init = () => {
+    setCounter(TotalSec);
+    setNowWord("");
+    setRestWordList([]);
+
+    clearInterval(Timer.current);
+    Timer.current = null;
+  };
+
+  const doTimer = useCallback(() => {
+    if (Timer.current !== null) {
+      clearInterval(Timer.current);
+      Timer.current = null;
+    }
+
     Timer.current = setInterval(() => {
       setCounter((Counter) => (Counter - 1));
     }, 1000);
-  
+  }, []);
+
+  const pickWord = useCallback(() => {
+    if (RestWordList) {
+      const rate = Math.random();
+      const radnum = Math.floor(rate * RestWordList.length);
+      const pre = RestWordList.slice(0, radnum);
+      const aft = RestWordList.slice(radnum + 1, RestWordList.length);
+      setNowWord(RestWordList[radnum]);
+      setRestWordList([...pre, ...aft]);
+    }
+  }, [RestWordList]);
+
+  useEffect(() => {
     return () => {
       clearInterval(Timer.current);
+      Timer.current = null;
     }
   }, []);
+
+  useEffect(() => {
+    if (prevRestWordList && prevRestWordList.length === 0 && RestWordList && RestWordList.length > 0) {
+      pickWord();
+      doTimer();
+    }
+  }, [RestWordList]);
+
+  useEffect(() => {
+    if (previsVisible === false && isVisible === true) {
+      setRestWordList(OriginData);
+    }
+    else {
+      if (Timer.current !== null) {
+        clearInterval(Timer.current);
+        Timer.current = null;
+        setCounter(TotalSec);
+      }
+    }
+  }, [isVisible]);
 
   useEffect(() => {
     if (Counter < 0) {
@@ -27,11 +85,21 @@ export default function DailyMission () {
       Timer.current = null;
       setCounter(0);
     }
+    else if (Counter === 0 && RestWordList && RestWordList.length > 0) {
+      setCounter(TotalSec);
+      pickWord();
+      doTimer();
+    }
   }, [Counter]);
+
+  const onCloseModal = () => {
+    init();
+    closeModal();
+  };
 
   const renderClose = () => (
     <>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={onCloseModal}>
         <View style={styles.closeView}>
           <IconAnt name="closecircleo" size={20} color="#000" />
         </View>
@@ -41,7 +109,7 @@ export default function DailyMission () {
 
   const renderWord = () => (
     <View style={styles.wordView}>
-      <Text style={styles.wordTxt}>單自</Text>
+      <Text style={styles.wordTxt}>{NowWord}</Text>
     </View>
   );
 
@@ -71,7 +139,7 @@ export default function DailyMission () {
   );
 
   return (
-    <Modal visible={true} contentContainerStyle={styles.modalContainer}>
+    <Modal visible={isVisible} contentContainerStyle={styles.modalContainer} onDismiss={onCloseModal}>
       <View style={styles.container}>
         {renderClose()}
         {renderWord()}
@@ -101,6 +169,7 @@ const styles = StyleSheet.create({
   wordView: {
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 16,
   },
   wordTxt: {
     fontWeight: "bold",

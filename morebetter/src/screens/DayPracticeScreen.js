@@ -22,6 +22,8 @@ export default DayPracticeScreen = (props) => {
   const [CurrentTab, setCurrentTab] = useState(TAB_SUM.voc);
   const [NeedChange, setNeedChange] = useState(1);
 
+  const [isVisibleGame, setisVisibleGame] = useState(false);
+
   const prevCurrentTab = usePrevious(CurrentTab);
 
   const FlatListRef = useRef(null);
@@ -29,7 +31,7 @@ export default DayPracticeScreen = (props) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => {ToastAndroid.show("aaa", ToastAndroid.SHORT)}}>
+        <TouchableOpacity onPress={onOpenGame}>
           <View style={{ width: 32 + 24, height: 32, paddingRight: 12, justifyContent: "center", alignItems: "center" }}>
             <IconIonicons name="game-controller-outline" size={24} color={CommonStyle.blue.color}/>
           </View>
@@ -52,6 +54,14 @@ export default DayPracticeScreen = (props) => {
       setNeedChange(NeedChange + 1);
     }
   }, [CurrentTab]);
+
+  const onCloseGame = () => {
+    setisVisibleGame(false);
+  }
+
+  const onOpenGame = () => {
+    setisVisibleGame(true);
+  }
 
   const onClickedCopy = (txt) => {
     if(txt && typeof txt === "string"){
@@ -116,7 +126,7 @@ export default DayPracticeScreen = (props) => {
         renderItem={({item,index})=> renderBlock(item,index,(CurrentTab === TAB_SUM.voc))}
         ListFooterComponent={renderGirl()}
       />
-      <DailyMission />
+      <DailyMission isVisible={isVisibleGame} closeModal={onCloseGame} data={(dataList) ? dataList.concat(SentenceList) : []}/>
     </View>
   );
 }
