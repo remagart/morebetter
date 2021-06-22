@@ -5,8 +5,10 @@ import IconAnt from "react-native-vector-icons/AntDesign";
 import CommonStyle from '../../style/CommonStyle';
 import * as Progress from 'react-native-progress';
 import usePrevious from '../../hook/usePrevious';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TotalSec = 30;
+const GAME_HARD_KEY = "@game_hard_key";
 
 export default function DailyMission ({
   isVisible = false,
@@ -41,6 +43,12 @@ export default function DailyMission ({
     }, 1000);
   }, []);
 
+  const wordRefresh = useCallback(() => {
+    setCounter(TotalSec);
+    pickWord();
+    doTimer();
+  });
+
   const pickWord = useCallback(() => {
     // console.log(RestWordList);
     if (RestWordList) {
@@ -62,8 +70,7 @@ export default function DailyMission ({
 
   useEffect(() => {
     if (prevRestWordList && prevRestWordList.length === 0 && RestWordList && RestWordList.length > 0) {
-      pickWord();
-      doTimer();
+      wordRefresh();
     }
   }, [RestWordList]);
 
@@ -87,9 +94,7 @@ export default function DailyMission ({
       setCounter(0);
     }
     else if (Counter === 0 && RestWordList && RestWordList.length > 0) {
-      setCounter(TotalSec);
-      pickWord();
-      doTimer();
+      wordRefresh();
     }
     else if (Counter === 0 && RestWordList && RestWordList.length === 0) {
       onCloseModal(true);
@@ -99,6 +104,33 @@ export default function DailyMission ({
   const onCloseModal = (isFinish) => {
     init();
     closeModal(isFinish);
+  };
+
+  const onClickNext = () => {
+    if (RestWordList && RestWordList.length === 1) {
+      onCloseModal(true);
+    }
+    else {
+      wordRefresh();
+    }
+  };
+
+  async function getHardList() {
+    let ori = await AsyncStorage.getItem(GAME_HARD_KEY);
+    if(ori === null || ori === "[]") ori = [];
+    else {
+      ori = JSON.parse(ori);
+    }
+
+    return ori;
+  }
+
+  const onClickedHard = async () => {
+    let ori = await getHardList();
+    ori.push(NowWord);
+    await AsyncStorage.setItem(GAME_HARD_KEY, JSON.stringify(ori));
+
+    onClickNext();
   };
 
   const renderClose = () => (
@@ -128,13 +160,13 @@ export default function DailyMission ({
 
   const renderBottom = () => (
     <View style={styles.bottomView}>
-      <TouchableOpacity style={styles.bottomBtn} onPress={() => {}}>
+      <TouchableOpacity style={styles.bottomBtn} onPress={onClickedHard}>
         <View style={styles.bottomBtn}>
           <Text style={styles.bottomTxt}>有點難</Text>
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.bottomBtn} onPress={() => {}}>
+      <TouchableOpacity style={styles.bottomBtn} onPress={onClickNext}>
           <View style={styles.bottomBtn}>
             <Text style={styles.bottomTxt}>順利完成</Text>
           </View>
