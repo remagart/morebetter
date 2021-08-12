@@ -10,7 +10,7 @@ import usePrevious from '../hook/usePrevious';
 import GirlModule from '../component/girl/GirlModule';
 
 // const DAY11 = "2020-07-17";
-const DAY1 = "2021-06-03";
+const DAY1 = "2021-08-12";
 const InitDay = 1;
 const NOW = DateHelper.getOptionalTimeFormatString(DateHelper.currentTimeMillis());
 const DUR = DateHelper.calculateDurationMin(DAY1,NOW,"days");
