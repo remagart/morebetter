@@ -1,5 +1,5 @@
 import React, { useEffect,useState, useRef, useCallback } from 'react'
-import { Text, View,StyleSheet,FlatList,TouchableOpacity } from 'react-native';
+import { Text, View,StyleSheet,FlatList,TouchableOpacity, ActivityIndicator } from 'react-native';
 import {Fib} from "../utils/forgetting_curve/Fibonacci";
 import DateHelper from '../utils/common/DateHelper';
 import CommonStyle from "../style/CommonStyle";
@@ -13,14 +13,16 @@ import GirlModule from '../component/girl/GirlModule';
 const DAY1 = "2021-08-12";
 const InitDay = 1;
 const NOW = DateHelper.getOptionalTimeFormatString(DateHelper.currentTimeMillis());
-const DUR = DateHelper.calculateDurationMin(DAY1,NOW,"days");
 
 const RecordScreen = (props) => {
   const [dayData, setdayData] = useState([]);
 	const [dataList, setdataList] = useState([]);
 	const [StudyTimer, setStudyTimer] = useState(0);
 	const [ChangePic, setChangePic] = useState(1);
-	
+
+	const [DUR, setDUR] = useState(DateHelper.calculateDurationMin(DAY1,NOW,"days"));
+	const [iswaiting, setiswaiting] = useState(true);
+
 	const FlatListRef = useRef(null);
 
 	const prevStudyTimer = usePrevious(StudyTimer);
@@ -28,16 +30,29 @@ const RecordScreen = (props) => {
 	const timer = useRef(null);
 
 	useEffect(()=>{
-		let day = Fib(DUR);
-		setdayData(day);
+		const fetchMyConfig = async () => {
+			let response = await new APIManager().getMyConfig();
+			let data = await response.json();
+
+			let dur = DateHelper.calculateDurationMin(data.data.EnglishEveryday.start_day,NOW,"days");
+			setDUR(dur);
+
+			let day = Fib(dur);
+			setdayData(day);
+		}
 
 		const fetchData = async()=>{
 			let list = await new APIManager().getEnglishEveryDay().then((response)=>response.json());
 			// console.log("list",list);
 
 			setdataList(list.data);
+			const timer = setTimeout(() => {
+				clearTimeout(timer);
+				setiswaiting(false);
+			}, 1000);
 		}
 
+		fetchMyConfig();
 		fetchData();
 
 		const now = DateHelper.currentTimeMillis();
@@ -54,7 +69,7 @@ const RecordScreen = (props) => {
 			time: dur,
 			second: sec,
 		});
-		
+
 		return () => {
 			if (timer.current !== null) {
 				clearInterval(timer.current);
@@ -99,7 +114,7 @@ const RecordScreen = (props) => {
 			firstword = tar.vocabulary[0] || "";
 			firstSentence = tar.sentences[0] || "";
 		}
-		
+
 		return { firstword, target, dayFromStart, firstSentence };
 	}
 
@@ -117,7 +132,7 @@ const RecordScreen = (props) => {
 			</View>
 		);
 	}
-	
+
 	const renderBlock = (item, idx) => {
 		const { firstword, target, dayFromStart, firstSentence } = calculateCurve(item);
 		if(firstword === null){
@@ -164,14 +179,22 @@ const RecordScreen = (props) => {
 						)
 					}}
 				/>
-				
+
 			</>
 		);
 	}
 
 	return (
 		<View style={styles.container}>
-			{renderList()}
+			{(iswaiting === true) ? (
+				<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+					<ActivityIndicator
+						size={"large"}
+						color={CommonStyle.mainColor.color}
+					/>
+				</View>
+			): renderList()}
+
 		</View>
 	)
 }

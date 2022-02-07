@@ -4,6 +4,8 @@ import StringHelper from "../utils/common/StringHelper";
 // Google spring sheet needs to publish to internet so that you can use parameter of sheet
 const URI = {
     GOOGLE_SHEET: "https://spreadsheets.google.com/feeds/list/{excel_id}/{sheet}/public/values?alt=json",
+    getEnglishEveryDay: "https://script.google.com/macros/s/AKfycbzWtmPVo0mvLV_j-y7BPIYQ0jEM4UbBOtU6TMQK/exec",
+    getMyConfig: "https://script.google.com/macros/s/AKfycbzpUKJRb-ttXemgwrfNEZYgQ008bf8pUU-_ChvUc2GEc4MMxxhU/exec",
 }
 
 const SHEET_INFO = {
@@ -27,8 +29,15 @@ export default class APIManager {
     }
 
     getEnglishEveryDay = () => {
-        const url = "https://script.google.com/macros/s/AKfycbzWtmPVo0mvLV_j-y7BPIYQ0jEM4UbBOtU6TMQK/exec";
+        const url = URI.getEnglishEveryDay;
         return AutoRedirectFetch("getEnglishEveryDay",`${url}`,{
+            method: "GET",
+        });
+    }
+
+    getMyConfig = () => {
+        const url = URI.getMyConfig;
+        return AutoRedirectFetch("getMyConfig", url, {
             method: "GET",
         });
     }
