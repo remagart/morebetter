@@ -73,7 +73,7 @@ const HomeScreen = (props) => {
     return (
       <View style={[styles.container, { alignItems: "center", justifyContent: "center" }]}>
         <ActivityIndicator
-          color={CommonStyle.mainColor}
+          color={CommonStyle.mainColor.color}
           size={"large"}
         />
       </View>
