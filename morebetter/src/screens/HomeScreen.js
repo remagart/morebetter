@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, createRef} from 'react';
+import React, {useState, useEffect, useRef, createRef} from 'react';
 import {
   Text,
   View,
@@ -6,15 +6,40 @@ import {
   StyleSheet,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import NavigationScreenName from '../navigation/NavigationScreenName';
 import NavigationHelper from '../navigation/NavigationHelper';
 import AndroidDateTimePicker from '../component/common/AndroidDateTimePicker';
+import APIManager from "../API/APIManager";
+import CommonStyle from "../style/CommonStyle";
 
 const {width: SCREEN_WIDTH} = Dimensions.get('screen');
 
 const HomeScreen = (props) => {
   let DatePickerRef = createRef(null);
+  const [firstDay, setfirstDay] = useState("");
+  const [allList, setallList] = useState([]);
+  const [isLoading, setisLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let response = await new APIManager().getMyConfig();
+        let dataConfig = await response.json();
+
+        setfirstDay(dataConfig.data.EnglishEveryday.start_day);
+
+        let list = await new APIManager().getEnglishEveryDay().then((response)=>response.json());
+        setallList(list.data);
+        setisLoading(false);
+      } catch(err) {
+        console.log("fetchData Homepage error", err);
+      }
+    }
+
+    fetchData();
+  }, [])
 
   const onClickedAndroidDatePicker = () => {
     console.log('DatePickerRef', DatePickerRef);
@@ -25,7 +50,7 @@ const HomeScreen = (props) => {
     ) {
       DatePickerRef &&
         DatePickerRef.current &&
-        DatePickerRef.current.onPressDate();
+        DatePickerRef.current.onPressDate(allList, firstDay);
     }
   };
 
@@ -43,6 +68,17 @@ const HomeScreen = (props) => {
       </>
     );
   };
+
+  if (isLoading === true) {
+    return (
+      <View style={[styles.container, { alignItems: "center", justifyContent: "center" }]}>
+        <ActivityIndicator
+          color={CommonStyle.mainColor}
+          size={"large"}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
