@@ -73,10 +73,14 @@ export default DayPracticeScreen = (props) => {
       Clipboard.setString(t);
       ToastAndroid.show("Copied!",ToastAndroid.SHORT);
 
-      // const translate = encodeURIComponent("翻譯");
-      // const googlequery = `https://www.google.com/search?q=${t}+${translate}`;
+      let isPhrase = (t.split(" ").length > 1);
+
       // const googlequery = `https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B9%81%E9%AB%94/${t}`;
-      const googlequery = `https://www.oxfordlearnersdictionaries.com/definition/english/${t}?q=${t}`;
+      let googlequery = `https://www.oxfordlearnersdictionaries.com/definition/english/${t}?q=${t}`;
+      if (isPhrase) {
+        const translate = encodeURIComponent("翻譯");
+        googlequery = `https://www.google.com/search?q=${t}+${translate}`;
+      }
       Linking.openURL(googlequery);
     }
   }
@@ -109,7 +113,7 @@ export default DayPracticeScreen = (props) => {
             <Text style={vocStyle}>單字</Text>
           </View>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.tab} onPress={()=>{ setCurrentTab(TAB_SUM.sen) }}>
           <View style={styles.tab}>
             <Text style={senStyle}>片語</Text>
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 50,
     flexDirection: "row",
-  }, 
+  },
   tab: {
     justifyContent: "center",
     alignItems: "center",

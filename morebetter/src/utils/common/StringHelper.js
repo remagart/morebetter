@@ -9,8 +9,8 @@ export default class StringHelper {
     }
 
     static fotmatCopiedTxt(str){
-        let reg = /\(.*\)$/gi;    // fit the "()" which is behind the word
-        
+        let reg = /\s*\(.*\)$/gi;    // fit the "()" which is behind the word
+
         let isNeed = reg.test(str);
         if(isNeed == true){
             let temp = str.replace(reg,"");
