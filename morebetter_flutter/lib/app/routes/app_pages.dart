@@ -13,6 +13,6 @@ abstract class AppPages {
     GetPage(name: AppRoutes.english, page: () => const EnglishPage()),
     GetPage(name: AppRoutes.login, page: () => const LoginPage()),
     GetPage(name: AppRoutes.fcOverview, page: () => const FCOverviewPage()),
-    GetPage(name: AppRoutes.fcDetail, page: () => const FCDetailPage())
+    GetPage(name: AppRoutes.fcDetail, page: () => FCDetailPage())
   ];
 }
