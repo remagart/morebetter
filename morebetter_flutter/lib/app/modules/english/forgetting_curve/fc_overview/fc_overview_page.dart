@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
+import 'package:morebetter_flutter/app/data/models/english/english_everyday_model.dart';
+import 'package:morebetter_flutter/app/modules/english/forgetting_curve/fc_overview/fc_overview_controller.dart';
 import 'package:morebetter_flutter/app/routes/app_pages.dart';
 import 'package:morebetter_flutter/core/theme/text_theme.dart';
 import 'package:morebetter_flutter/core/values/colors.dart';
@@ -19,7 +21,7 @@ class FCOverviewPage extends StatelessWidget {
   }
 }
 
-class RenderOverview extends StatelessWidget {
+class RenderOverview extends GetView<FcOverviewController> {
   RenderOverview({Key? key}) : super(key: key);
 
   final List listData = List.generate(
@@ -31,15 +33,15 @@ class RenderOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        renderHeader(),
-        SizedBox(
-          height: 570, // TODO: 是否有好的方法
-          child: renderList(listData),
-        )
-      ],
-    );
+    return Obx(() => Column(
+          children: [
+            renderHeader(),
+            SizedBox(
+              height: 570, // TODO: 是否有好的方法
+              child: renderList(controller.englishEverydayList),
+            )
+          ],
+        ));
   }
 }
 
@@ -72,7 +74,7 @@ Widget renderHeader() {
   );
 }
 
-Widget renderList(List data) {
+Widget renderList(List<EnglishEverydayModel> data) {
   return ListView.builder(
       itemCount: data.length,
       shrinkWrap: true,
@@ -80,17 +82,15 @@ Widget renderList(List data) {
             children: [
               ListTile(
                 onTap: (() => Get.toNamed(AppRoutes.fcDetail)),
-                leading: const Icon(
-                  Icons.date_range_rounded,
-                  color: Colors.red,
-                  size: 30,
-                ),
+                leading: Text("Day ${index + 1}"),
                 trailing: const Icon(
                   Icons.arrow_forward_ios_rounded,
                 ),
                 dense: true,
-                title: Text(data[index]["product"]),
-                subtitle: Text(data[index]["product"]),
+                title: Text(
+                    "單字：${(data[index].vocabulary.isEmpty) ? "" : data[index].vocabulary[0]}"),
+                subtitle: Text(
+                    "片語：${(data[index].sentences.isEmpty) ? "" : data[index].sentences[0]}"),
               ),
               const Divider(
                 height: 1,
