@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/instance_manager.dart';
 import 'package:morebetter_flutter/app/modules/english/forgetting_curve/fc_detail/widget/fc_detail_phrase_tab_widget.dart';
 import 'package:morebetter_flutter/app/modules/english/forgetting_curve/fc_detail/widget/fc_detail_vocabulary_tab_widget.dart';
 import 'package:morebetter_flutter/core/theme/text_theme.dart';
 import 'package:morebetter_flutter/core/values/colors.dart';
+import 'package:get/get.dart';
 
 class FCDetailPage extends StatefulWidget {
-  FCDetailPage({Key? key}) : super(key: key);
+  // TODO: 可以這樣做嗎? 且只能寫字串?
+  final List wordList = Get.arguments['wordList'];
+  final List sentenceList = Get.arguments['sentenceList'];
+
+  FCDetailPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<FCDetailPage> createState() => _FCDetailPageState();
+  State<FCDetailPage> createState() =>
+      _FCDetailPageState(wordList, sentenceList);
 }
 
 class _FCDetailPageState extends State<FCDetailPage> {
+  final List wordList;
+  final List sentenceList;
+
+  _FCDetailPageState(this.wordList, this.sentenceList);
+
   bool isWordTab = true;
 
   final List tempData = List.generate(
@@ -46,7 +60,7 @@ class _FCDetailPageState extends State<FCDetailPage> {
                 ]),
           ),
           body: (isWordTab == true)
-              ? FcDetailVocabularyTabWidget(wordData: tempData)
+              ? FcDetailVocabularyTabWidget(wordData: wordList)
               : FcDetailPhraseTabWidget(),
         ));
   }

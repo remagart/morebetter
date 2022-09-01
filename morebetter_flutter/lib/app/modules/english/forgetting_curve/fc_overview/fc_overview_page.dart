@@ -81,7 +81,10 @@ Widget renderList(List<EnglishEverydayModel> data) {
       itemBuilder: ((context, index) => Column(
             children: [
               ListTile(
-                onTap: (() => Get.toNamed(AppRoutes.fcDetail)),
+                onTap: (() => Get.toNamed(AppRoutes.fcDetail, arguments: {
+                      "wordList": data[index].vocabulary,
+                      "sentenceList": data[index].sentences
+                    })),
                 leading: Text("Day ${index + 1}"),
                 trailing: const Icon(
                   Icons.arrow_forward_ios_rounded,

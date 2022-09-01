@@ -49,7 +49,7 @@ class FcDetailVocabularyTabWidget extends StatelessWidget {
                 onLongPress: () {
                   print("mcmcm");
                 },
-                title: Text("${index}"),
+                title: Text("${index + 1} ${wordData[index]}"),
                 trailing: Icon(
                   Icons.copy,
                   size: 20,
