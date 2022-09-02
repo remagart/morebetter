@@ -61,7 +61,7 @@ class _FCDetailPageState extends State<FCDetailPage> {
           ),
           body: (isWordTab == true)
               ? FcDetailVocabularyTabWidget(wordData: wordList)
-              : FcDetailPhraseTabWidget(),
+              : FcDetailPhraseTabWidget(sentenceList: sentenceList),
         ));
   }
 }

@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:morebetter_flutter/app/modules/english/forgetting_curve/fc_detail/utils/on_tap_handler.dart';
+import 'package:morebetter_flutter/core/utils/string_helper.dart';
 import 'package:morebetter_flutter/core/values/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../utils/slidable_action_tools.dart';
 
 class FcDetailVocabularyTabWidget extends StatelessWidget {
   final List wordData;
@@ -22,34 +28,15 @@ class FcDetailVocabularyTabWidget extends StatelessWidget {
               endActionPane: ActionPane(
                 motion: DrawerMotion(),
                 children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      print("xxx");
-                    },
-                    backgroundColor: Color(0xFF7BC043),
-                    foregroundColor: lightColorScheme.onPrimaryContainer,
-                    icon: Icons.language,
-                    label: 'Google',
-                  ),
-                  SlidableAction(
-                    onPressed: (context) {
-                      print("xxxyyy");
-                    },
-                    backgroundColor: lightColorScheme.primaryContainer,
-                    foregroundColor: lightColorScheme.onPrimaryContainer,
-                    icon: Icons.book,
-                    label: '中文詞典',
-                  ),
+                  goGoogleTranslate(wordData[index]),
+                  goMadarinDictionary(wordData[index])
                 ],
               ),
               child: ListTile(
-                onTap: () {
-                  print("asddd");
-                },
-                onLongPress: () {
-                  print("mcmcm");
-                },
-                title: Text("${index + 1} ${wordData[index]}"),
+                onTap: () => OnTapHandler.copyText_toast(wordData[index]),
+                onLongPress: () =>
+                    OnTapHandler.goOxfordDictionary(wordData[index]),
+                title: Text("${index + 1}. ${wordData[index]}"),
                 trailing: Icon(
                   Icons.copy,
                   size: 20,
