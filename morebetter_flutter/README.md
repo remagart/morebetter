@@ -16,6 +16,10 @@ For help getting started with Flutter, view our
 samples, guidance on mobile development, and a full API reference.
 
 
+#### JSON to Dart
+1. 將json貼至example/input.json
+2. run `dart example/generate_model_by_input.dart yourClassName`
+
 #### Create model classes by json_serializable
 
 [doc](https://docs.flutter.dev/development/data-and-backend/json#serializing-json-using-code-generation-libraries)

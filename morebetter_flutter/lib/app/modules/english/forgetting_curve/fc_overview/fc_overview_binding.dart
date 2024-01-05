@@ -6,7 +6,7 @@ class FcOverviewBindings extends Bindings {
   @override
   void dependencies() {
     // TODO: 使用put就沒辦法？
-    Get.lazyPut(() => EnglishEverydayApiProvider());
-    Get.lazyPut(() => FcOverviewController());
+    Get.put(EnglishEverydayApiProvider());
+    Get.put(FcOverviewController());
   }
 }

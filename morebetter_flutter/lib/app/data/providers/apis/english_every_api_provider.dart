@@ -2,7 +2,7 @@ import 'package:morebetter_flutter/app/data/models/base/api_result.dart';
 import 'package:morebetter_flutter/app/data/models/english/english_everyday_model.dart';
 import 'package:morebetter_flutter/app/data/providers/apis/base_api_provider.dart';
 
-import '../../models/english/base_response_model.dart';
+import '../../models/base/base_response_model.dart';
 
 class EnglishEverydayApiProvider {
   final apiProvider = BaseApiProvider();
